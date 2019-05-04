@@ -56,7 +56,7 @@ void histograma(int maximo, int array[], int largoArray) {
   }
   int linea = 1;
   for (i = 0; i < maximo; i++) {
-    double terceraColumna = (double) segundaColumna[i] / (double) largoArray;
+    double terceraColumna = (double) segundaColumna[i] / largoArray;
     printf("%d\t%d\t%g\n", linea++, segundaColumna[i], terceraColumna);
   }
 }
