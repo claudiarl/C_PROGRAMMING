@@ -8,7 +8,7 @@
 
 int leeNumeros(char*arch, double x[])
 {
-	int n, npts;
+	int n,l,npts;
 	double xa;
 	
 	FILE*fin;
@@ -21,6 +21,7 @@ int leeNumeros(char*arch, double x[])
 		if(n==1 && npts<NMAXPTS)
 		{
 			x[npts]=xa;
+			printf("Los valores leídos son %g\n",xa);
 		}
 		npts++;
 	}
@@ -32,10 +33,46 @@ int leeNumeros(char*arch, double x[])
 	{
 		npts=-1;
 	}
+	printf("El número total de datos del archivo es %d\n",npts);
 	return npts;
+	
 }
 
-void histograma(int npts, double x[], int nhist, int histo[], double x_min, double x_max)
+int main(int argc,char**argv)
+ {
+	int xp;
+	double xa;
+	double arrayDeLeeNumeros[NMAXPTS];
+	leeNumeros("prueba.dat",arrayDeLeeNumeros);
+	
+	while(xa=0){
+	xp++;
+	printf("de nuevo%d\n",xa);
+	}
+/*	
+
+ FILE * fout = fopen("huecos.dat", "w"); 
+	for(npts=0;npts<NMAXPTS;npts++)
+{
+	do
+	{
+		xp++;
+	
+	}
+	while(clander=0);
+}	
+
+
+for(l=1;l<(L/2);l++)
+{
+	int numerohuecosmismalong= */
+	//fprintf(fout, "%d\n", xp);
+//fprintf(fout, "%d\n", l);
+//}
+
+	return 0;
+	}
+/*void histograma(int npts, double x[], int nhist, int histo[], double x_min, double x_max)
 {
 	int i,n;
 	
@@ -56,6 +93,7 @@ void histograma(int npts, double x[], int nhist, int histo[], double x_min, doub
 	}
 	return;
 }
+ 
 
 int main(int argc, char**argv)
 {
@@ -77,3 +115,4 @@ int main(int argc, char**argv)
 	}
 	return 0;
 }
+*/

@@ -21,6 +21,7 @@ int leeNumeros(char*arch, double x[])
 		if(n==1 && npts<NMAXPTS)
 		{
 			x[npts]=xa;
+			printf("Los valores leídos son%g\n",xa);
 		}
 		npts++;
 	}
@@ -32,9 +33,12 @@ int leeNumeros(char*arch, double x[])
 	{
 		npts=-1;
 	}
+	
 	return npts;
-}
+	
 
+return 0;
+}
 void histograma(int npts, double x[], int nhist, int histo[], double x_min, double x_max)
 {
 	int i,n;
@@ -56,6 +60,7 @@ void histograma(int npts, double x[], int nhist, int histo[], double x_min, doub
 	}
 	return;
 }
+ 
 
 int main(int argc, char**argv)
 {
@@ -77,3 +82,4 @@ int main(int argc, char**argv)
 	}
 	return 0;
 }
+

@@ -1,18 +1,15 @@
 #include <stdio.h>
 #include <math.h>
+#include "libprobabilidad.h"
 
-#define X_MIN 0.0
-#define X_MAX 1.0
-#define NHISTOGRAMA 100
-#define NMAXPTS 10000
 
 int leeNumeros(char*arch, double x[])
 {
-	int n, npts;
+	int n, npts,NMAXPTS;
 	double xa;
 	
 	FILE*fin;
-	fin=fopen(arch,"r");
+	fin=fopen("poroso.dat","r");
 	
 	npts=0;
 	do
@@ -35,35 +32,14 @@ int leeNumeros(char*arch, double x[])
 	return npts;
 }
 
-void histograma(int npts, double x[], int nhist, int histo[], double x_min, double x_max)
-{
-	int i,n;
-	
-	for(i=0;i<nhist;i++)
-	{
-		histo[i]=0;
-	}
-	for(n=0;n<npts;n++)
-	{
-		double floorArgument = (nhist*(x[n]-x_min))/(x_max-x_min);
-		i=(int)floor(floorArgument);
-
-		if(0<=i && i<NHISTOGRAMA)
-		{
-			histo[i]++;
-		}
-	
-	}
-	return;
-}
 
 int main(int argc, char**argv)
 {
-	int naleatorios,i;
-	double aleatorios[NMAXPTS],dx,x,f;
+	int NMAXPTS,naleatorios,i;
+	double aleatorios[NMAXPTS],dx,x,f,X_MIN,X_MAX;
 	int histo[NHISTOGRAMA];
 	
-	naleatorios=leeNumeros("prueba.dat",aleatorios);
+	naleatorios=leeNumeros("poroso.dat",aleatorios);
 	
 	histograma(naleatorios,aleatorios,NHISTOGRAMA,histo,X_MIN,X_MAX);
 	dx=(double)(X_MAX-X_MIN)/NHISTOGRAMA;

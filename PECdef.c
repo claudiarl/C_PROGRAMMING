@@ -13,6 +13,8 @@ int main(int argc, char**argv)
 		exit(0);
 	}
 	
+	FILE*fout;
+	fout=fopen("poroso.dat","w");
 	L=atoi(argv[1]);
 	r=atof(argv[2]);
 	if(L<1)
@@ -40,8 +42,9 @@ int main(int argc, char**argv)
 			result=0;
 		}
 
-		printf("%d\t%g\t%d\t%g\n",n,rnd,result,p);
+		printf("%d\t%d\n",n,result);
+		fprintf(fout,"%d\t%d\n",n,result);
 	}
+
 	return 0;
 }
-	
