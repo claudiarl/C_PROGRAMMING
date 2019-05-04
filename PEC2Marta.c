@@ -1,8 +1,9 @@
 #include <stdio.h>
-
 #include <stdlib.h>
-
 #include <time.h>
+#include <math.h>
+
+#define NHISTOGRAMA 100
 
 void generarPoroso(int L, double r, int poroso[]) {
   double p = 1 / (1 + r); //Probabilidad de opacos en el poroso
@@ -35,6 +36,34 @@ void generarPoroso(int L, double r, int poroso[]) {
     }
     poroso[n] = result;
   }
+}
+
+void histograma(int npts, double x[], int nhist, int histo[], double x_min, double x_max)
+{
+	int i,n;
+	
+	for(i=0;i<nhist;i++)
+	{
+		histo[i]=0;
+	}
+
+	for(n=0;n<npts;n++)
+	{
+		double floorArgument = (nhist*(x[n]-x_min))/(x_max-x_min);
+		i=(int)floor(floorArgument);
+
+		if(0<=i && i<NHISTOGRAMA)
+		{
+			histo[i]++;
+		}
+	
+	}
+	return;
+}
+
+int filtrarArray(int array[], int tamano)
+{ 
+
 }
 
 int main(int argc, char ** argv) {
@@ -76,11 +105,30 @@ int main(int argc, char ** argv) {
 	grupoCeros[m] = numeroCeros;
   }
 
+
+  //Filtrar el array que he obtenido
+  int contador = 0;
   for (j = 0; j <= L; j++) {
     if (grupoCeros[j] != -1 && grupoCeros[j] != 0) {
-      printf("%d\n", grupoCeros[j]);
+      contador++;
     }
   }
+  
+  int huecos[contador];
+  int vueltas = 0;
+  for (j = 0; j <= L; j++) {
+    if (grupoCeros[j] != -1 && grupoCeros[j] != 0) {
+		huecos[vueltas++] = grupoCeros[j];
+    }
+  }
+  
+  
+  
+  for (j = 0; j < contador; j++) {
+    printf("%d\n", huecos[j]);
+  }
+  printf("\n");
+
 
   return 0;
 }
