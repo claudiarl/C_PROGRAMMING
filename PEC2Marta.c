@@ -3,7 +3,6 @@
 #include <time.h>
 #include <math.h>
 
-#define NHISTOGRAMA 100
 
 void generarPoroso(int L, double r, int poroso[]) {
   double p = 1 / (1 + r); //Probabilidad de opacos en el poroso
@@ -40,7 +39,7 @@ void generarPoroso(int L, double r, int poroso[]) {
 
 void histograma(int npts, double x[], int nhist, int histo[], double x_min, double x_max)
 {
-	int i,n;
+	int i,n,L;
 	
 	for(i=0;i<nhist;i++)
 	{
@@ -52,7 +51,7 @@ void histograma(int npts, double x[], int nhist, int histo[], double x_min, doub
 		double floorArgument = (nhist*(x[n]-x_min))/(x_max-x_min);
 		i=(int)floor(floorArgument);
 
-		if(0<=i && i<NHISTOGRAMA)
+		if(0<=i && i<L)
 		{
 			histo[i]++;
 		}
@@ -128,6 +127,9 @@ int main(int argc, char ** argv) {
     printf("%d\n", huecos[j]);
   }
   printf("\n");
+
+
+  histograma(int npts, double x[], int nhist, int histo[], double x_min, double x_max)
 
 
   return 0;

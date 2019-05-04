@@ -3,41 +3,14 @@
 
 #define X_MIN 0.0
 #define X_MAX 1.0
-#define NHISTOGRAMA 100
+#define NHISTOGRAMA 4
 #define NMAXPTS 10000
-
-int leeNumeros(char*arch, double x[])
-{
-	int n, npts;
-	double xa;
-	
-	FILE*fin;
-	fin=fopen(arch,"r");
-	
-	npts=0;
-	do
-	{
-		n=fscanf(fin, "%lf", &xa);
-		if(n==1 && npts<NMAXPTS)
-		{
-			x[npts]=xa;
-		}
-		npts++;
-	}
-	while(n==1 && npts<=NMAXPTS);
-	
-	fclose(fin);
-	
-	if(npts==NMAXPTS+1 && n==1)
-	{
-		npts=-1;
-	}
-	return npts;
-}
 
 //nhist tamaño histo
 //x es nuestros tamaños de huecos
 //npts es el tamaño de la x
+//histo[i] es número de valores en cajas
+//f es frecuencia relativa de valores en cajas
 void histograma(int npts, double x[], int nhist, int histo[], double x_min, double x_max)
 {
 	int i,n;
@@ -64,10 +37,11 @@ void histograma(int npts, double x[], int nhist, int histo[], double x_min, doub
 int main(int argc, char**argv)
 {
 	int naleatorios,i;
-	double aleatorios[NMAXPTS],dx,x,f;
+	double aleatorios[NMAXPTS] = {5,3,1,1};
+	double dx,x,f;
 	int histo[NHISTOGRAMA];
 	
-	naleatorios=leeNumeros("prueba.dat",aleatorios);
+	naleatorios=4;
 	
 	histograma(naleatorios,aleatorios,NHISTOGRAMA,histo,X_MIN,X_MAX);
 	dx=(double)(X_MAX-X_MIN)/NHISTOGRAMA;
