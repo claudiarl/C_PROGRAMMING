@@ -1,55 +1,175 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <math.h>
-#include "libprobabilidad.h"
+#include <unistd.h>
 
+void generarPoroso(int L, double r, int poroso[]) {
+  double p = 1 / (1 + r); //Probabilidad de opacos en el poroso
+  int n; //Índice de los bucles
+  double rnd; //Números aleatorios generados
+  char result; //Variable auxiliar que almacenará los valores del medio poroso
 
-int leeNumeros(char*arch, double x[])
-{
-	int n, npts,NMAXPTS;
-	double xa;
-	
-	FILE*fin;
-	fin=fopen("poroso.dat","r");
-	
-	npts=0;
-	do
-	{
-		n=fscanf(fin, "%lf", &xa);
-		if(n==1 && npts<NMAXPTS)
-		{
-			x[npts]=xa;
-		}
-		npts++;
-	}
-	while(n==1 && npts<=NMAXPTS);
-	
-	fclose(fin);
-	
-	if(npts==NMAXPTS+1 && n==1)
-	{
-		npts=-1;
-	}
-	return npts;
+  /* Si la longitud del poroso provista 
+   * es menor que 1, la ajusto a 1*/
+  if (L < 1) {
+    L = 1;
+  }
+
+  //Inicialización del random
+  int semilla = (int) time(NULL);
+  srand(semilla);
+
+  //Calentamiento
+  for (n = 0; n < 2 * L; n++) {
+    rnd = (double) rand() / (RAND_MAX + 1.0);
+  }
+
+  //Generación y guardado del poroso
+  for (n = 0; n < L; n++) {
+    rnd = (double) rand() / (RAND_MAX + 1.0);
+    if (rnd <= p) {
+      result = 1;
+    } else {
+      result = 0;
+    }
+    poroso[n] = result;
+  }
 }
 
+int cuantosNumero(int largoArray, int array[], int numero) {
+  int i;
+  int contadorNumero = 0;
+  for (i = 0; i < largoArray; i++) {
+    if (array[i] == numero) {
+      contadorNumero++;
+    }
+  }
+  return contadorNumero;
+}
 
-int main(int argc, char**argv)
-{
-	int NMAXPTS,naleatorios,i;
-	double aleatorios[NMAXPTS],dx,x,f,X_MIN,X_MAX;
-	int histo[NHISTOGRAMA];
+void histograma(int maximo, int array[], int largoArray) {
+  int i;
+  int segundaColumna[maximo];
+  for (i = 0; i < maximo; i++) {
+    segundaColumna[i] = cuantosNumero(largoArray, array, i + 1);
+  }
+  int linea = 1;
+  for (i = 0; i < maximo; i++) {
+    double terceraColumna = (double) segundaColumna[i] / (double) largoArray;
+    printf("%d\t%d\t%g\n", linea++, segundaColumna[i], terceraColumna);
+  }
+}
+
+int hallarLargoArrayLimpio(int tamanoSucio, int arraySucio[]) {
+  //Hallo el tamaño del arrayLimpio
+  int contador = 0;
+  int j;
+  for (j = 0; j <= tamanoSucio; j++) {
+    if (arraySucio[j] != -1 && arraySucio[j] != 0) {
+      contador++;
+    }
+  }
+  return contador;
+}
+
+void filtrarArray(int tamanoSucio, int arraySucio[], int arrayLimpio[]) {
+  //Relleno un nuevo array quitando -1s y 0s del arraySucio
+  int vueltas = 0;
+  int j;
+  for (j = 0; j <= tamanoSucio; j++) {
+    if (arraySucio[j] != -1 && arraySucio[j] != 0) {
+      arrayLimpio[vueltas++] = arraySucio[j];
+    }
+  }
+}
+
+int hallarMinimo(int array[], int largoArray) {
+  int minimo = array[0];
+  int j;
+  for (j = 0; j < largoArray; j++) {
+    if (array[j] < minimo) {
+      minimo = array[j];
+    }
+  }
+  return minimo;
+}
+
+int hallarMaximo(int array[], int largoArray) {
+  int maximo = array[0];
+  int j;
+  for (j = 0; j < largoArray; j++) {
+    if (array[j] > maximo) {
+      maximo = array[j];
+    }
+  }
+  return maximo;
+}
+
+int main(int argc, char ** argv) {
+  //Salida del programa si los argumentos no son los esperados
+  if (argc < 3) {
+    printf("Uso del programa:\n %s <no.puntos, porosidad, número de cadenas>\n", argv[0]);
+    exit(0);
+  }
+
+  int L = atoi(argv[1]); //Longitud del poroso
+  double r = atof(argv[2]); //Porosidad del medio
+  int N = atoi(argv[3]); //Número de cadenas
+  
+  //Índices de los bucles
+  int n, m, j, t;
+  
+  for (t = 0; t < N; t++) {
+	printf("Genero histograma %d\n",t+1);
 	
-	naleatorios=leeNumeros("poroso.dat",aleatorios);
-	
-	histograma(naleatorios,aleatorios,NHISTOGRAMA,histo,X_MIN,X_MAX);
-	dx=(double)(X_MAX-X_MIN)/NHISTOGRAMA;
-	
-	for(i=0;i<NHISTOGRAMA;i++)
-	{
-		x=X_MIN+(double)i*dx;
-		f=(double)histo[i]/(naleatorios*dx);
-		
-		printf("%g\t%d\t%g\n",x,histo[i],f);
-	}
-	return 0;
+    //Genero poroso, lo guardo en un array y lo imprimo por pantalla
+    int poroso[L];
+    generarPoroso(L, r, poroso);
+    
+    // Pinto el poroso (cadenas de 0 y 1)
+    for (int j = 0; j < L; j++) {
+      printf("%d, ", poroso[j]);
+    }
+    printf("\n");
+    
+	//Creo un array de -1s tan largo como el poroso
+    int grupoCeros[L];
+    for (j = 0; j <= L; j++) {
+      grupoCeros[j] = -1;
+    }
+
+    //Recorro el poroso y guardo el número de grupos de ceros y su tamaño
+    for (n = 0; n < L; n++) {
+      int m = n;
+      int numeroCeros = 0;
+      while (poroso[m] == 0 && m < L) {
+        numeroCeros++;
+        m++;
+      }
+      n = m;
+      grupoCeros[m] = numeroCeros;
+    }
+
+    //Filtrar el array que he obtenido
+    int largoArrayLimpio = hallarLargoArrayLimpio(L, grupoCeros);
+    int arrayLimpio[largoArrayLimpio];
+    filtrarArray(L, grupoCeros, arrayLimpio);
+
+    /* Pinto los huecos
+    for(n = 0;n<largoArrayLimpio;n++){
+	  printf("%d, ",arrayLimpio[n]);
+    }
+    printf("\n");
+    */
+    
+    //Hallo el mínimo y el máximo dentro del array ya filtrado
+    int minimo = hallarMinimo(arrayLimpio, largoArrayLimpio);
+    int maximo = hallarMaximo(arrayLimpio, largoArrayLimpio);
+
+    //Genero el histograma
+    histograma(maximo, arrayLimpio, largoArrayLimpio);
+    sleep(1);
+  }
+  return 0;
 }

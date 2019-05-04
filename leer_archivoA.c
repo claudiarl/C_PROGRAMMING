@@ -60,62 +60,26 @@ void histograma(int npts, double x[], int nhist, int histo[], double x_min, doub
 		}
 	
 	}
+	
 	return;
 }
-
-int hallarMinimo(int array[], int largoArray){
-  int minimo = array[0];
-  int j;
-  for (j = 0; j < largoArray; j++)
-  {
-	  if(array[j]<minimo){
-		minimo = array[j];
-	  }
-  }
-  return minimo;
-}
-
-int hallarMaximo(int array[], int largoArray){
-  int maximo = array[0];
-  int j;
-  for (j = 0; j < largoArray; j++)
-  {
-	  if(array[j]>maximo){
-		maximo = array[j];
-	  }
-  }
-  return maximo;
-}
-
 
 int main(int argc, char**argv)
 {
 	int naleatorios,i;
-	
-	int numeros [NMAXPTS];
-	numeros = leeNumeros("prueba.dat",aleatorios);
-	
-  //Hallo el mínimo y el máximo dentro del array ya filtrado
-  int minimo = hallarMinimo(arrayLimpio, largoArrayLimpio);
-  printf("El mínimo es %d\n",minimo);
-  int maximo = hallarMaximo(arrayLimpio, largoArrayLimpio);
-  printf("El máximo es %d\n",maximo);
-	
-	
 	int NHISTOGRAMA=atoi(argv[1]);
-	
 	double aleatorios[NMAXPTS],dx,x,f;
 	int histo[NHISTOGRAMA];
 	
-	//naleatorios=leeNumeros("prueba.dat",aleatorios);
+	naleatorios=leeNumeros("prueba.dat",aleatorios);
 	
-	histograma(numeros,aleatorios,NHISTOGRAMA,histo,X_MIN,X_MAX);
+	histograma(naleatorios,aleatorios,NHISTOGRAMA,histo,X_MIN,X_MAX);
 	dx=(double)(X_MAX-X_MIN)/NHISTOGRAMA;
 	
 	for(i=0;i<NHISTOGRAMA;i++)
 	{
 		x=X_MIN+(double)i*dx;
-		f=(double)histo[i]/(numeros*dx);
+		f=(double)histo[i]/(naleatorios*dx);
 		
 		printf("%g\t%d\t%g\n",x,histo[i],f);
 	}
