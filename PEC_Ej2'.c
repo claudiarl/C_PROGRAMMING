@@ -55,10 +55,8 @@ void histograma(int maximo, int array[], int largoArray, int N, int L) {
     segundaColumna[i] = cuantosNumero(largoArray, array, i + 1);
   }
   int linea = 1;
-  double normalizador = (double) N * L;
   for (i = 0; i < maximo; i++) {
-	double sinNormalizar = (double)(segundaColumna[i]) / (double)(largoArray);
-    double terceraColumna = sinNormalizar * normalizador;
+    double terceraColumna = (double)(segundaColumna[i]) / (double)(N*L);
     printf("%d\t%d\t%g\n", linea++, segundaColumna[i], terceraColumna);
   }
 }

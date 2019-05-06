@@ -1,8 +1,13 @@
 #include <stdio.h>
+
 #include <stdlib.h>
+
 #include <time.h>
+
 #include <math.h>
+
 #include <unistd.h>
+
 
 void generarPoroso(int L, double r, int poroso[]) {
   double p = 1 / (1 + r); //Probabilidad de opacos en el poroso
@@ -55,10 +60,8 @@ void histograma(int maximo, int array[], int largoArray, int N, int L) {
     segundaColumna[i] = cuantosNumero(largoArray, array, i + 1);
   }
   int linea = 1;
-  double normalizador = (double) N * L;
   for (i = 0; i < maximo; i++) {
-	double sinNormalizar = (double)(segundaColumna[i]) / (double)(largoArray);
-    double terceraColumna = sinNormalizar * normalizador;
+    double terceraColumna = (double)(segundaColumna[i]) / (double)(N * L);
     printf("%d\t%d\t%g\n", linea++, segundaColumna[i], terceraColumna);
   }
 }
@@ -86,27 +89,7 @@ void filtrarArray(int tamanoSucio, int arraySucio[], int arrayLimpio[]) {
   }
 }
 
-int hallarMinimo(int array[], int largoArray) {
-  int minimo = array[0];
-  int j;
-  for (j = 0; j < largoArray; j++) {
-    if (array[j] < minimo) {
-      minimo = array[j];
-    }
-  }
-  return minimo;
-}
 
-int hallarMaximo(int array[], int largoArray) {
-  int maximo = array[0];
-  int j;
-  for (j = 0; j < largoArray; j++) {
-    if (array[j] > maximo) {
-      maximo = array[j];
-    }
-  }
-  return maximo;
-}
 
 int main(int argc, char ** argv) {
   //Salida del programa si los argumentos no son los esperados
@@ -120,58 +103,77 @@ int main(int argc, char ** argv) {
   int N = atoi(argv[3]); //Número de cadenas
   
   //Índices de los bucles
-  int n, m, j, t;
-  
+  int n, m, j, t,ultimaPosicionRellenaTodosHuecosfinal;
+  int ultimaPosicionRellenaTodosHuecos=0;
+  int TodosHuecos[ultimaPosicionRellenaTodosHuecos];
+ 
   for (t = 0; t < N; t++) {
-	printf("Genero histograma %d\n",t+1);
-	
+    printf("Genero cadenas %d\n", t + 1);
+
     //Genero poroso, lo guardo en un array y lo imprimo por pantalla
     int poroso[L];
     generarPoroso(L, r, poroso);
-    
+
     // Pinto el poroso (cadenas de 0 y 1)
     for (int j = 0; j < L; j++) {
       printf("%d, ", poroso[j]);
     }
     printf("\n");
-    
-	//Creo un array de -1s tan largo como el poroso
-    int grupoCeros[L];
+
+//Creo un array de -1s de longitud L/2
+    int distanciaCeros[L];
     for (j = 0; j <= L; j++) {
-      grupoCeros[j] = -1;
+      distanciaCeros[j] = -1;
     }
-
-    //Recorro el poroso y guardo el número de grupos de ceros y su tamaño HE CAMBIADO A L/2
-    for (n = 0; n < L; n++) {
-      int m = n;
+//Hacia la derecha
+	for(n=0;n<L;n++){
+	  int m = n;
       int numeroCeros = 0;
-      while (poroso[m] == 0 && m < L/2) {
-        numeroCeros++;
-        m++;
-      }
-      n = m;
-      grupoCeros[m] = numeroCeros;
+	  if(poroso[m] == 0 && m < L) {
+		  numeroCeros++;
+		  m++; 
+		  distanciaCeros[m] = numeroCeros-1;
+	  }
+	  n=m;
+  }
+
+   //Pinto el array de distancias sin filtrar
+    for(n = 0;n<L;n++){
+	  printf("%d, ",distanciaCeros[m]);
     }
-
+    printf("\n");
+    
     //Filtrar el array que he obtenido
-    int largoArrayLimpio = hallarLargoArrayLimpio(L, grupoCeros);
+    int largoArrayLimpio = hallarLargoArrayLimpio(L, distanciaCeros);
     int arrayLimpio[largoArrayLimpio];
-    filtrarArray(L, grupoCeros, arrayLimpio);
+    filtrarArray(L, distanciaCeros, arrayLimpio);
 
-    /* Pinto los huecos
+    //Pinto el array de distancias
     for(n = 0;n<largoArrayLimpio;n++){
 	  printf("%d, ",arrayLimpio[n]);
     }
     printf("\n");
-    */
-    
-    //Hallo el mínimo y el máximo dentro del array ya filtrado
-    int minimo = hallarMinimo(arrayLimpio, largoArrayLimpio);
-    int maximo = hallarMaximo(arrayLimpio, largoArrayLimpio);
-
-    //Genero el histograma
-    histograma(maximo, arrayLimpio, largoArrayLimpio,N, L);
+   
     sleep(1);
+  /*    //Creo un array con todos los valores anteriores de huecos de las N cadenas
+    int i,j;  
+    int k = 0;
+	  for (j=ultimaPosicionRellenaTodosHuecos;j<ultimaPosicionRellenaTodosHuecos+largoArrayLimpio;j++)
+	  {
+			TodosHuecos[j] = arrayLimpio[k++];
+	  }
+    
+    //printf("ultima posicion era %d\n",ultimaPosicionRellenaTodosHuecos);
+    ultimaPosicionRellenaTodosHuecos+=largoArrayLimpio;
+    
+    //Pinto el array todos huecos
+    for(n = 0;n<ultimaPosicionRellenaTodosHuecos+largoArrayLimpio;n++){
+	  printf("%d, ",TodosHuecos[n]);
+    }
+    printf("\n");
+    printf("ultima posicion rellena es %d\n",ultimaPosicionRellenaTodosHuecos);
   }
+*/
+}
   return 0;
 }
