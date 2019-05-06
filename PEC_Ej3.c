@@ -8,6 +8,8 @@
 
 #include <unistd.h>
 
+#define LARGO 1000
+#define LENGTH 10000
 
 void generarPoroso(int L, double r, int poroso[]) {
   double p = 1 / (1 + r); //Probabilidad de opacos en el poroso
@@ -89,8 +91,6 @@ void filtrarArray(int tamanoSucio, int arraySucio[], int arrayLimpio[]) {
   }
 }
 
-
-
 int main(int argc, char ** argv) {
   //Salida del programa si los argumentos no son los esperados
   if (argc < 3) {
@@ -101,12 +101,11 @@ int main(int argc, char ** argv) {
   int L = atoi(argv[1]); //Longitud del poroso
   double r = atof(argv[2]); //Porosidad del medio
   int N = atoi(argv[3]); //Número de cadenas
-  
+
   //Índices de los bucles
-  int n, m, j, t,ultimaPosicionRellenaTodosHuecosfinal;
-  int ultimaPosicionRellenaTodosHuecos=0;
-  int TodosHuecos[ultimaPosicionRellenaTodosHuecos];
- 
+  int n, m, j, t;
+  int LongCorrel[LENGTH], ultimaPosicionRellenaTodosHuecos=0;
+  int derechas [LENGTH];
   for (t = 0; t < N; t++) {
     printf("Genero cadenas %d\n", t + 1);
 
@@ -119,43 +118,104 @@ int main(int argc, char ** argv) {
       printf("%d, ", poroso[j]);
     }
     printf("\n");
-
-//Creo un array de -1s de longitud L/2
-    int distanciaCeros[L];
-    for (j = 0; j <= L; j++) {
-      distanciaCeros[j] = -1;
+    
+    
+    //Creo un array de -1s de longitud L/2
+    int grupoCeros[L / 2];
+    for (j = 0; j <= L / 2; j++) {
+      grupoCeros[j] = -1;
     }
-//Hacia la derecha
-	for(n=0;n<L;n++){
-	  int m = n;
+	int m;
+    //Recorro el poroso y guardo el número de grupos de ceros y su tamaño HE CAMBIADO A L/2
+    for (n = 0; n < L; n++) {
+      m = n;
       int numeroCeros = 0;
-	  if(poroso[m] == 0 && m < L) {
-		  numeroCeros++;
-		  m++; 
-		  distanciaCeros[m] = numeroCeros-1;
-	  }
-	  n=m;
-  }
-
-   //Pinto el array de distancias sin filtrar
-    for(n = 0;n<L;n++){
-	  printf("%d, ",distanciaCeros[m]);
+      while (poroso[m] == 0 && m < L / 2) {
+        numeroCeros++;
+        m++;
+      }
+      n = m;
+      grupoCeros[m] = numeroCeros;
+    }
+    
+     //Filtrar el array que he obtenido
+    int largoArrayLimpio = hallarLargoArrayLimpio(L, grupoCeros);
+    int arrayLimpio[largoArrayLimpio];
+    filtrarArray(L, grupoCeros, arrayLimpio);
+    
+    
+    for (int a = 0; a < largoArrayLimpio; a++) {
+      printf("%d, ", arrayLimpio[a]);
     }
     printf("\n");
+     sleep(1);
+   
     
+    printf("Ceros derecha\n");
+	for(int n = 0; n<largoArrayLimpio;n++){
+		int numeroActual = arrayLimpio[n];
+		int derechita[numeroActual-1];
+		
+		for(int i=0;i<(arrayLimpio[n]-1);i++){
+			derechita[i] = --numeroActual;
+		}
+		for (int k = 0; k < (arrayLimpio[n]-1); k++) {
+			printf("%d, ", derechita[k]);
+		}
+		printf("\n");
+	//Creo un array con todos los valores anteriores de huecos de las N cadenas
+    int i, j;
+    int k = 0;
+    for (j = ultimaPosicionRellenaTodosHuecos; j < ultimaPosicionRellenaTodosHuecos + arrayLimpio[n]-1; j++) {
+      derechas[j] = derechita[k++];
+    }
+
+    //printf("ultima posicion era %d\n",ultimaPosicionRellenaTodosHuecos);
+    ultimaPosicionRellenaTodosHuecos += arrayLimpio[n]-1;
+    //printf("ultima posicion es %d\n",ultimaPosicionRellenaTodosHuecos);
+	}
+	
+	 printf("ultima posicion es %d\n",ultimaPosicionRellenaTodosHuecos); 
+    
+    //Pinto el array todos huecos
+    for (int v = 0; v < ultimaPosicionRellenaTodosHuecos; v++) {
+      printf("%d, ", derechas[v]);
+    }
+    printf("\n");
+	}
+    
+    //Media
+    int suma = 0;
+     for (int i = 0; i < n; i++){ 
+		suma += derechas[i]; 
+  }
+	
+	double media=(double)suma/(double)ultimaPosicionRellenaTodosHuecos;
+	printf("LA media ES %g\n",media);
+ 
+   //Como el calculo por la izquierda es igual, el resultado final de la media es el doble del obtenido previamente
+    double longitud_correlacion=2*media;
+    printf("La longitud de correlacion es %g\n",longitud_correlacion);
+
+    //Pinto el array de distancias sin filtrar
+    /*for (n = 0; n < L; n++) {
+      printf("%d, ", distanciaCeros[m]);
+    }
+    printf("\n");
+
     //Filtrar el array que he obtenido
     int largoArrayLimpio = hallarLargoArrayLimpio(L, distanciaCeros);
     int arrayLimpio[largoArrayLimpio];
     filtrarArray(L, distanciaCeros, arrayLimpio);
 
     //Pinto el array de distancias
-    for(n = 0;n<largoArrayLimpio;n++){
-	  printf("%d, ",arrayLimpio[n]);
+    for (n = 0; n < largoArrayLimpio; n++) {
+      printf("%d, ", arrayLimpio[n]);
     }
     printf("\n");
-   
+
     sleep(1);
-  /*    //Creo un array con todos los valores anteriores de huecos de las N cadenas
+    /*    //Creo un array con todos los valores anteriores de huecos de las N cadenas
     int i,j;  
     int k = 0;
 	  for (j=ultimaPosicionRellenaTodosHuecos;j<ultimaPosicionRellenaTodosHuecos+largoArrayLimpio;j++)
@@ -174,6 +234,6 @@ int main(int argc, char ** argv) {
     printf("ultima posicion rellena es %d\n",ultimaPosicionRellenaTodosHuecos);
   }
 */
-}
+  
   return 0;
 }
