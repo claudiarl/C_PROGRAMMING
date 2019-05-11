@@ -8,7 +8,7 @@
 
 #include <unistd.h>
 
-#define LENGTH 1000000
+#define LENGTH 10000
 
 void generarPoroso(int L, double r, int poroso[]) {
   double p = 1 / (1 + r); //Probabilidad de opacos en el poroso
@@ -60,13 +60,9 @@ void histograma(int maximo, int array[], int largoArray, int N, int L) {
     segundaColumna[i] = cuantosNumero(largoArray, array, i + 1);
   }
   int linea = 1;
-   //Fichero donde se guardará el histograma
-  FILE * fout = fopen("histograma.dat", "w"); 
-  //Generación y guardado del histograma
   for (i = 0; i < maximo; i++) {
     double terceraColumna = (double)(segundaColumna[i]) / (double)(N * L);
-    //printf("%d\t%d\t%g\n", linea++, segundaColumna[i], terceraColumna);
-    fprintf(fout, "%d\t%d\t%g\n", linea++, segundaColumna[i], terceraColumna);
+    printf("%d\t%d\t%g\n", linea++, segundaColumna[i], terceraColumna);
   }
 }
 
@@ -137,17 +133,17 @@ int main(int argc, char ** argv) {
     //Genero poroso, lo guardo en un array y lo imprimo por pantalla
     int poroso[L];
     generarPoroso(L, r, poroso);
-/*
+
     // Pinto el poroso (cadenas de 0 y 1)
     for (int j = 0; j < L; j++) {
       printf("%d, ", poroso[j]);
     }
-    printf("\n");*/
+    printf("\n");
+	
 
-
-    //Creo un array de -1s de longitud L
-    int grupoCeros[L];
-    for (j = 0; j <= L; j++) {
+    //Creo un array de -1s de longitud L/2
+    int grupoCeros[L / 2];
+    for (j = 0; j <= L / 2; j++) {
       grupoCeros[j] = -1;
     }
 
@@ -155,24 +151,28 @@ int main(int argc, char ** argv) {
     for (n = 0; n < L; n++) {
       int m = n;
       int numeroCeros = 0;
-      while (poroso[m] == 0 && m < L) {
+      while (poroso[m] == 0 && m < L / 2) {
         numeroCeros++;
         m++;
       }
       n = m;
       grupoCeros[m] = numeroCeros;
     }
-
+ printf("\n");
+    printf("Grupo ceros");
+    for (int j = 0; j < L; j++) {
+      printf("%d, ", grupoCeros[j]);
+    }
     //Filtrar el array que he obtenido
     int largoArrayLimpio = hallarLargoArrayLimpio(L, grupoCeros);
     int arrayLimpio[largoArrayLimpio];
     filtrarArray(L, grupoCeros, arrayLimpio);
-/*
+ printf("\n");
     //Pinto los huecos
     for (n = 0; n < largoArrayLimpio; n++) {
       printf("%d, ", arrayLimpio[n]);
     }
-    printf("\n");*/
+    printf("\n");
 
     sleep(1);
     
@@ -199,7 +199,6 @@ int main(int argc, char ** argv) {
 
   //Genero el histograma
   histograma(maximo, TodosHuecos, ultimaPosicionRellenaTodosHuecos, N, L);
-  
 
   return 0;
 }
