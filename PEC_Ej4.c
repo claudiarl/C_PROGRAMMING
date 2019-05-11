@@ -67,11 +67,11 @@ void guardarPosicionesCeros(int longitudPoroso, int poroso[], int indicesCeros[]
     imprimirArray(indiceAux, indicesCeros, "Indices Ceros");
 }
 
-int hallarLargoReal(int longitudMaxima, int *array) {
+int hallarLargoSaltandoNumeros(int numeroQueMeSalto, int longitudMaxima, int *array) {
     int contador = 0;
     int j;
     for (j = 0; j <= longitudMaxima; j++) {
-        if (array[j] != -1) {
+        if (array[j] != numeroQueMeSalto) {
             contador++;
         }
     }
@@ -88,7 +88,7 @@ int posicionAleatoriaDeCero(int longitud, int *array) {
     int indicesCeros[longitud];
     rellenarDeMenosUnos(longitud, indicesCeros);
     guardarPosicionesCeros(longitud, array, indicesCeros);
-    int longitudArrayIndices = hallarLargoReal(longitud, indicesCeros);
+    int longitudArrayIndices = hallarLargoSaltandoNumeros(-1, longitud, indicesCeros);
 
     inicializarRandom(longitud);
     int randomIndice = rand() % longitudArrayIndices;
@@ -116,6 +116,14 @@ int contarCerosAlLado(char *lado, int primeraPosicion, int longitud, int *array)
         }
     }
     return cerosAlLado;
+}
+
+double mediaArray(int longitud, int *array) {
+    double suma = 0;
+    for(int j = 0; j<longitud;j++){
+        suma +=array[j];
+    }
+    return suma/(double)hallarLargoSaltandoNumeros(0, longitud, array);
 }
 
 int main(int argc, char **argv) {
@@ -158,6 +166,11 @@ int main(int argc, char **argv) {
     }
 
     imprimirArray(N*numeroCerosACoger, cerosLados, "Ceros Lados");
+
+
+    double media = mediaArray(N*numeroCerosACoger, cerosLados);
+
+    printf("La media es %g\n", media);
 
     return 0;
 }
