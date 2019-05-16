@@ -10,16 +10,25 @@ int main(int argc, char ** argv) {
     printf("Uso del programa:\n %s <no.puntos>\n", argv[0]);
     exit(0);
   }
-
-  int L = atoi(argv[1]); //Longitud del poroso
-  double r = atof(argv[2]); //Porosidad del medio
-  double p = 1 / (1 + r); //Probabilidad de opacos en el poroso
-  int n; //Índice de los bucles
-  double rnd; //Números aleatorios generados
-  char result; //Variable auxiliar que almacenará los valores del medio poroso
+  //Longitud del poroso
+  int L = atoi(argv[1]);
   
-  /* Si la longitud del poroso provista 
-   * es menor que 1, la ajusto a 1*/
+  //Porosidad del medio
+  double r = atof(argv[2]);
+  
+  //Probabilidad de opacos en el poroso
+  double p = 1 / (1 + r);
+  
+  //Índice de los bucles
+  int n;
+  
+  //Números aleatorios generados
+  double rnd;
+  
+  //Variable auxiliar que almacenará los valores del medio poroso
+  char result;
+  
+  //Si la longitud del poroso provista es menor que 1, ajustar a 1
   if (L < 1) 
   {
     L = 1;

@@ -10,7 +10,13 @@
 
 #define LENGTH 1000000
 
-
+void imprimirArray(int longitud, int array[], char * nombreArray) {
+  printf("Inicio %s\n", nombreArray);
+  for (int j = 0; j < longitud; j++) {
+    printf("%d, ", array[j]);
+  }
+  printf("\nFin %s\n", nombreArray);
+}
 //Se escribe la función para generar el poroso, traída del Ejercicio 1
 void generarPoroso(int L, double r, int poroso[]) {
   double p = 1 / (1 + r); //Probabilidad de opacos en el poroso
@@ -22,13 +28,16 @@ void generarPoroso(int L, double r, int poroso[]) {
   if (L < 1) {
     L = 1;
   }
+
   //Inicialización del proceso de aleatorización definiendo la semilla
   int semilla = (int) time(NULL);
   srand(semilla);
+
   //Calentamiento
   for (n = 0; n < 2 * L; n++) {
     rnd = (double) rand() / (RAND_MAX + 1.0);
   }
+
   //Generación y guardado del poroso
   for (n = 0; n < L; n++) {
     rnd = (double) rand() / (RAND_MAX + 1.0);
@@ -41,44 +50,37 @@ void generarPoroso(int L, double r, int poroso[]) {
   }
 }
 
-int frecuencia(int longitudArray,int array[],int num)
-{
-	int i;
-	int contador = 0;
-  for (i = 0; i < longitudArray; i++) 
-  {
-    if (array[i] == num) 
-    {
-      contador++;
+int frecuencia(int largoArray, int array[], int numero) {
+  int i;
+  int contadorNumero = 0;
+  for (i = 0; i < largoArray; i++) {
+    if (array[i] == numero) {
+      contadorNumero++;
     }
   }
-  return contador;
+  return contadorNumero;
 }
 
-void histograma(int maximo, int array[], int longitudArray, int N, int L){
- //Generación del histograma
-   int i;
-   int primeraColumna;
+void histograma(int maximo, int array[], int largoArray, int N, int L) {
+  int i;
+  int primeraColumna;
   int segundaColumna[maximo];
   double terceraColumna;
-  
   // FILE * fout = fopen("histograma.dat", "w");
   for (i = 1; i <= maximo; i++) {
     primeraColumna = i;
-    segundaColumna[i - 1] = frecuencia(longitudArray,array,i);
+    segundaColumna[i - 1] = frecuencia(largoArray, array, i);
     terceraColumna = (double)(segundaColumna[i - 1]) / (double)(N * L);
     printf("%d\t%d\t%g\n", primeraColumna, segundaColumna[i - 1], terceraColumna);
     //printf("%d\t%g\t%g\n", primeraColumna, segundaColumna[i], terceraColumna);
   }
 }
-int hallarMaximo(int longitud, int array[])
-{
-  int j;
+
+int hallarMaximo(int array[], int largoArray) {
   int maximo = array[0];
-  for (j = 0; j < longitud; j++) 
-  {
-    if (array[j] > maximo) 
-    {
+  int j;
+  for (j = 0; j < largoArray; j++) {
+    if (array[j] > maximo) {
       maximo = array[j];
     }
   }
@@ -97,13 +99,11 @@ int main(int argc, char ** argv) {
   int N = atoi(argv[3]); //Número de cadenas
 
   //Índices de los bucles
-  int n, t, j, i;
+  int n, t;
   int extremo = 0;
   //Se crean arrays con longitud máxima definida mediante LENGTH
   int Huecos[LENGTH];
   int Array[LENGTH];
-  int contaje;
-  int cutArray[contaje];
   
   //Se inicializa un bucle for con las instrucciones para cada una de las N cadenas
   for (t = 0; t < N; t++) {
@@ -112,10 +112,6 @@ int main(int argc, char ** argv) {
     int poroso[L];
     generarPoroso(L, r, poroso);
 
-for (i=0;i<L;i++){
-	printf("%d, ", poroso[i]);
-}
-printf("\n");
 	//Contaje de los ceros
     int a = 0;
     int contaje = 0;
@@ -133,15 +129,8 @@ printf("\n");
         Array[a++] = numeroCeros;
       }
     }
-    
-   /* for (n=0;n<contaje;n++){
-		Array[n]=cutArray[n];
-		
-		imprimirArray(contaje,cutArray,"cutArray");
-	}
-	printf("el cutArray es");*/
 	//Se elimina la cola de ceros del array, conociendo ahora su longitud gracias a "contaje"
-   int flag = 1;
+    int flag = 1;
     for (n = 0; n < contaje; n++) 
     {
       if (flag == 1 && Array[n] != 0)
@@ -163,18 +152,13 @@ printf("\n");
       Huecos[n] = Array[k++];
     }
     extremo += contaje;
-  
-}
-for (i=0;i<extremo;i++){
-	printf("%d, ", Huecos[i]);
-}
-printf("\n");
-  //Cálculo del valor máximo del array para determinar la última fila del histograma
-  int maximo = hallarMaximo(extremo,Huecos);
- 
-    //Genero el histograma
+  }
+
+  //Cálculo el valor máximo del array para determinar la última fila del histograma
+  int maximo = hallarMaximo(Huecos, extremo);
+
+  //Generación del histograma
   histograma(maximo, Huecos, extremo, N, L);
-  
 
   return 0;
 }

@@ -4,219 +4,172 @@
 #include <math.h>
 #include <unistd.h>
 
-#define LARGO 100000
 #define LENGTH 1000000
 
+//Función para generar el poroso, importada del Ejercicio 1
 void generarPoroso(int L, double r, int poroso[]) {
-    double p = 1 / (1 + r); //Probabilidad de opacos en el poroso
-    int n; //Índice de los bucles
-    double rnd; //Números aleatorios generados
-    char result; //Variable auxiliar que almacenará los valores del medio poroso
+  double p = 1 / (1 + r); //Probabilidad de opacos en el poroso
+  int n; //Índice de los bucles
+  double rnd; //Números aleatorios generados
+  char result; //Variable auxiliar que almacenará los valores del medio poroso
 
-    /* Si la longitud del poroso provista
-     * es menor que 1, la ajusto a 1*/
-    if (L < 1) {
-        L = 1;
+  /* Si la longitud del poroso provista es menor que 1, se ajusta a 1*/
+  if (L < 1) {
+    L = 1;
+  }
+  //Inicialización del proceso de aleatorización definiendo la semilla
+  int semilla = (int) time(NULL);
+  srand(semilla);
+  //Calentamiento
+  for (n = 0; n < 2 * L; n++) {
+    rnd = (double) rand() / (RAND_MAX + 1.0);
+  }
+  //Generación y guardado del poroso
+  for (n = 0; n < L; n++) {
+    rnd = (double) rand() / (RAND_MAX + 1.0);
+    if (rnd <= p) {
+      result = 1;
+    } else {
+      result = 0;
     }
-
-    //Inicialización del random
-    int semilla = (int) time(NULL);
-    srand(semilla);
-
-    //Calentamiento
-    for (n = 0; n < 2 * L; n++) {
-        rnd = (double) rand() / (RAND_MAX + 1.0);
-    }
-
-    //Generación y guardado del poroso
-    for (n = 0; n < L; n++) {
-        rnd = (double) rand() / (RAND_MAX + 1.0);
-        if (rnd <= p) {
-            result = 1;
-        } else {
-            result = 0;
-        }
-        poroso[n] = result;
-    }
+    poroso[n] = result;
+  }
 }
 
-int cuantosNumero(int largoArray, int array[], int numero) {
-    int i;
-    int contadorNumero = 0;
-    for (i = 0; i < largoArray; i++) {
-        if (array[i] == numero) {
-            contadorNumero++;
-        }
+//Función para hallar el valor máximo de un array
+int hallarMaximo(int longitud, int array[]) {
+  int j;
+  int maximo = array[0];
+  for (j = 0; j < longitud; j++) {
+    if (array[j] > maximo) {
+      maximo = array[j];
     }
-    return contadorNumero;
+  }
+  return maximo;
 }
 
-void histograma(int maximo, int array[], int largoArray, int N, int L) {
-    int i;
-    int segundaColumna[maximo];
-    for (i = 0; i < maximo; i++) {
-        segundaColumna[i] = cuantosNumero(largoArray, array, i + 1);
+//Función para calcular la frecuencia de un número dado en un array
+int frecuencia(int longitudArray, int array[], int num) {
+  int i;
+  int contador = 0;
+  for (i = 0; i < longitudArray; i++) {
+    if (array[i] == num) {
+      contador++;
     }
-    int linea = 1;
-    for (i = 0; i < maximo; i++) {
-        double terceraColumna = (double) (segundaColumna[i]) / (double) (N * L);
-        printf("%d\t%d\t%g\n", linea++, segundaColumna[i], terceraColumna);
-    }
+  }
+  return contador;
 }
 
-int hallarLargoArrayLimpio(int tamanoSucio, int arraySucio[]) {
-    //Hallo el tamaño del arrayLimpio
-    int contador = 0;
-    int j;
-    for (j = 0; j <= tamanoSucio; j++) {
-        if (arraySucio[j] != -1 && arraySucio[j] != 0) {
-            contador++;
-        }
-    }
-    return contador;
+//Función para generar el histograma de frecuencias
+void histograma(int maximo, int array[], int longitudArray, int N, int L) {
+  int i;
+  //Se declaran las 5 columnas del histograma
+  int long_hueco;
+  int frec_hueco[maximo];
+  double frec_normalizada;
+  int frec_absoluta[maximo];
+  int total_ceros[maximo];
+  //Se calculan las 5 columnas del histograma
+  for (i = 1; i <= maximo; i++) {
+    long_hueco = i;
+    frec_hueco[i - 1] = frecuencia(longitudArray, array, i);
+    frec_normalizada = (double)(frec_hueco[i - 1]) / (double)(N * L);
+    frec_absoluta[i - 1] = long_hueco * (long_hueco - 1) * (double)(frec_hueco[i - 1]);
+    total_ceros[i - 1] = long_hueco * (double)(frec_hueco[i - 1]);
+    printf("%d\t%d\t%g\t%d\t%d\t\n", long_hueco, frec_hueco[i - 1], frec_normalizada, frec_absoluta[i - 1], total_ceros[i - 1]);
+  }
+  //Cálculo de la longitud de correlación
+  int suma_frec_absoluta = 0;
+  for (int i = 0; i < long_hueco; i++) {
+    suma_frec_absoluta += frec_absoluta[i];
+  }
+  int suma_total_ceros = 0;
+  for (int i = 0; i < long_hueco; i++) {
+    suma_total_ceros += total_ceros[i];
+  }
+  double long_correl = (double) suma_frec_absoluta / (2*(double) suma_total_ceros);
+  printf("La longitud de correlación es %g\n", long_correl);
 }
 
-void filtrarArray(int tamanoSucio, int arraySucio[], int arrayLimpio[]) {
-    //Relleno un nuevo array quitando -1s y 0s del arraySucio
-    int vueltas = 0;
-    int j;
-    for (j = 0; j <= tamanoSucio; j++) {
-        if (arraySucio[j] != -1 && arraySucio[j] != 0) {
-            arrayLimpio[vueltas++] = arraySucio[j];
-        }
+int main(int argc, char ** argv) {
+  //Salida del programa si los argumentos no son los esperados
+  if (argc < 3) {
+    printf("Uso del programa:\n %s <no.puntos, porosidad, número de cadenas>\n", argv[0]);
+    exit(0);
+  }
+
+  int L = atoi(argv[1]); //Longitud del poroso
+  double r = atof(argv[2]); //Porosidad del medio
+  int N = atoi(argv[3]); //Número de cadenas
+
+  //Índices de los bucles
+  int n, t, j, i;
+  //Se definen variables que se emplearán dentro del bucle for
+  int contaje;
+  int extremo = 0;
+  //Se crean arrays con longitud máxima definida mediante LENGTH
+  int Huecos[LENGTH];
+  int Array[LENGTH];
+
+  //Se inicializa un bucle for con las instrucciones para cada una de las N cadenas
+  for (t = 0; t < N; t++) {
+    //Generación y guardado del poroso en el array "poroso"
+    int poroso[L];
+    generarPoroso(L, r, poroso);
+
+    //Impresión de los porosos generados
+    for (i = 0; i < L; i++) {
+      printf("%d, ", poroso[i]);
     }
-}
+    printf("\n");
 
-int main(int argc, char **argv) {
-    //Salida del programa si los argumentos no son los esperados
-    if (argc < 3) {
-        printf("Uso del programa:\n %s <no.puntos, porosidad, número de cadenas>\n", argv[0]);
-        exit(0);
-    }
-
-    int L = atoi(argv[1]); //Longitud del poroso
-    double r = atof(argv[2]); //Porosidad del medio
-    int N = atoi(argv[3]); //Número de cadenas
-
-    //Índices de los bucles
-    int n, m, j, t;
-    int LongCorrel[LENGTH], ultimaPosicionRellenaTodosHuecos = 0;
-    int arrayEntero[LENGTH];
-    for (t = 0; t < N; t++) {
-        printf("Genero cadenas %d\n", t + 1);
-
-        //Genero poroso, lo guardo en un array y lo imprimo por pantalla
-        int poroso[L];
-        generarPoroso(L, r, poroso);
-
-        // Pinto el poroso (cadenas de 0 y 1)
-        for (int j = 0; j < L; j++) {
-            printf("%d, ", poroso[j]);
-        }
-        printf("\n");
-
-        //Creo un array de -1s de longitud L
-        int grupoCeros[L];
-        for (j = 0; j <= L; j++) {
-            grupoCeros[j] = -1;
-        }
-        int m;
-        //Recorro el poroso y guardo el número de grupos de ceros y su tamaño HE CAMBIADO A L/2
-        for (n = 0; n < L; n++) {
-            m = n;
-            int numeroCeros = 0;
-            while (poroso[m] == 0 && m < L) {
-                numeroCeros++;
-                m++;
-            }
-            n = m;
-            grupoCeros[m] = numeroCeros;
-        }
-
-        //Filtrar el array que he obtenido
-        int largoArrayLimpio = hallarLargoArrayLimpio(L, grupoCeros);
-        int arrayLimpio[largoArrayLimpio];
-        filtrarArray(L, grupoCeros, arrayLimpio);
-
-        for (int a = 0; a < largoArrayLimpio; a++) {
-            printf("%d, ", arrayLimpio[a]);
-        }
-        printf("\n");
-        sleep(1);
-
-        //Creo un array con todos los arrayLimpios de las N cadenas
-        int i, j;
-        int k = 0;
-        for (j = ultimaPosicionRellenaTodosHuecos; j < ultimaPosicionRellenaTodosHuecos + arrayLimpio[n] - 1; j++) {
-            arrayEntero[j] = arrayLimpio[k++];
-        }
-
-        //printf("ultima posicion era %d\n",ultimaPosicionRellenaTodosHuecos);
-        ultimaPosicionRellenaTodosHuecos += arrayLimpio[n] - 1;
-        //printf("ultima posicion es %d\n",ultimaPosicionRellenaTodosHuecos);
-        printf("ultima posicion es %d\n", ultimaPosicionRellenaTodosHuecos);
-
-        //Pinto el array entero
-        for (int v = 0; v < ultimaPosicionRellenaTodosHuecos; v++) {
-            printf("%d, ", arrayEntero[v]);
-        }
-        printf("\n");
-
-    }
-    /*
-
-        //Media
-        int suma = 0;
-         for (int i = 0; i < n; i++){
-            suma += derechas[i];
-
+    //Contaje de los ceros consecutivos dentro de un poroso para obtener las longitudes de hueco
+    int a = 0;
+    int contaje = 0;
+    for (n = 0; n <= L; n++) {
+      int numeroCeros = 0;
+      //Se cuentan los ceros consecutivos y se almacenan en numeroCeros
+      while (poroso[n] == 0 && n < L) {
+        numeroCeros++;
+        n++;
       }
-      printf("la suma es %d",suma);
-
-        double media=(double)suma/(double)ultimaPosicionRellenaTodosHuecos;
-        printf("LA media ES %g\n",media);
-
-       //Como el calculo por la izquierda es igual, el resultado final de la media es el doble del obtenido previamente
-        double longitud_correlacion=2*media;
-        printf("La longitud de correlacion es %g\n",longitud_correlacion);
-    */
-    //Pinto el array de distancias sin filtrar
-    /*for (n = 0; n < L; n++) {
-        printf("%d, ", distanciaCeros[m]);
+      /*Se rellena un array con las longitudes de hueco omitiendo las que valgan cero
+       * Se actualiza el número de elementos que se van incluyendo en el array para obtener su longitud final mediante "contaje"*/
+      if (numeroCeros != 0) {
+        contaje++;
+        Array[a++] = numeroCeros;
       }
-      printf("\n");
-
-      //Filtrar el array que he obtenido
-      int largoArrayLimpio = hallarLargoArrayLimpio(L, distanciaCeros);
-      int arrayLimpio[largoArrayLimpio];
-      filtrarArray(L, distanciaCeros, arrayLimpio);
-
-      //Pinto el array de distancias
-      for (n = 0; n < largoArrayLimpio; n++) {
-        printf("%d, ", arrayLimpio[n]);
-      }
-      printf("\n");
-
-      sleep(1);
-      /*    //Creo un array con todos los valores anteriores de huecos de las N cadenas
-      int i,j;
-      int k = 0;
-        for (j=ultimaPosicionRellenaTodosHuecos;j<ultimaPosicionRellenaTodosHuecos+largoArrayLimpio;j++)
-        {
-              TodosHuecos[j] = arrayLimpio[k++];
-        }
-
-      //printf("ultima posicion era %d\n",ultimaPosicionRellenaTodosHuecos);
-      ultimaPosicionRellenaTodosHuecos+=largoArrayLimpio;
-
-      //Pinto el array todos huecos
-      for(n = 0;n<ultimaPosicionRellenaTodosHuecos+largoArrayLimpio;n++){
-        printf("%d, ",TodosHuecos[n]);
-      }
-      printf("\n");
-      printf("ultima posicion rellena es %d\n",ultimaPosicionRellenaTodosHuecos);
     }
-  */
+    //Se elimina la cola de ceros del array, conociendo ahora su longitud gracias a "contaje"
+    int flag = 1;
+    for (n = 0; n < contaje; n++) {
+      if (flag == 1 && Array[n] != 0)
+        flag = 0;
+    }
+    //Para evitar que todas las cadenas sean iguales, se genera una espera de 1 segundo de forma que cambie la semilla
+    sleep(1);
 
-    return 0;
+    /*Se genera el array "Huecos" con todas las longitudes de hueco de las N cadenas
+     * Para ello, se define la variable "extremo", que representa la longitud del array Huecos y
+     * se va actualizando tras cada paso del bucle al sumar contaje
+     * (es decir, la longitud de cada cadena de longitudes de hueco)*/
+    int k = 0;
+    for (n = extremo; n < extremo + contaje; n++) {
+      Huecos[n] = Array[k++];
+    }
+    extremo += contaje;
+
+  }
+  //Impresión del array Huecos
+  for (i = 0; i < extremo; i++) {
+    printf("%d, ", Huecos[i]);
+  }
+  printf("\n");
+  //Cálculo del valor máximo del array Huecos para determinar la última fila del histograma
+  int maximo = hallarMaximo(extremo, Huecos);
+
+  //Generación del histograma
+  histograma(maximo, Huecos, extremo, N, L);
+
+  return 0;
 }

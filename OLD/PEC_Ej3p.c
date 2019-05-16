@@ -63,19 +63,33 @@ int frecuencia(int longitudArray, int array[], int num) {
 //Función para generar el histograma de frecuencias
 void histograma(int maximo, int array[], int longitudArray, int N, int L) {
   int i;
+  //Se declaran las 5 columnas del histograma
   int long_hueco;
   int frec_hueco[maximo];
   double frec_normalizada;
-  //Se deja como comentario la opción de guardar el histograma en un archivo
-  // FILE * fout = fopen("histograma.dat", "w");
-  for (i = 1; i <= maximo; i++) 
-  {
+  int frec_absoluta[maximo];
+  int num_elem[maximo];
+  //Se calculan las 5 columnas del histograma
+  for (i = 1; i <= maximo; i++) {
     long_hueco = i;
     frec_hueco[i - 1] = frecuencia(longitudArray, array, i);
     frec_normalizada = (double)(frec_hueco[i - 1]) / (double)(N * L);
-    printf("%d\t%d\t%g\n", long_hueco, frec_hueco[i - 1], frec_normalizada);
-    //printf("%d\t%g\t%g\n", long_hueco, frec_hueco[i], frec_normalizada);
+    frec_absoluta[i - 1] = long_hueco * (long_hueco - 1) * (double)(frec_hueco[i - 1]);
+    num_elem[i - 1] = long_hueco * (double)(frec_hueco[i - 1]);
+    printf("%d\t%d\t%g\t%d\t%d\t\n", long_hueco, frec_hueco[i - 1], frec_normalizada, frec_absoluta[i - 1], num_elem[i - 1]);
   }
+  //Cálculo de la longitud de correlación
+  int suma_frec_absoluta = 0;
+  for (int i = 0; i < long_hueco; i++) {
+    suma_frec_absoluta += frec_absoluta[i];
+  }
+  int suma_num_elem = 0;
+  for (int i = 1; i < long_hueco; i++) {
+    suma_num_elem += num_elem[i];
+  }
+
+  double long_correl = (double) suma_frec_absoluta / (double) suma_num_elem;
+  printf("La longitud de correlación es %g\n", long_correl);
 }
 
 int main(int argc, char ** argv) {
@@ -95,22 +109,21 @@ int main(int argc, char ** argv) {
   int contaje;
   int extremo = 0;
   //Se crean arrays con longitud máxima definida mediante LENGTH
-  int Array[LENGTH];
   int Huecos[LENGTH];
-  
+  int Array[LENGTH];
+
   //Se inicializa un bucle for con las instrucciones para cada una de las N cadenas
   for (t = 0; t < N; t++) {
-
     //Generación y guardado del poroso en el array "poroso"
     int poroso[L];
     generarPoroso(L, r, poroso);
-	
-	//Impresión de los porosos generados
+
+    //Impresión de los porosos generados
     for (i = 0; i < L; i++) {
       printf("%d, ", poroso[i]);
     }
     printf("\n");
-    
+
     //Contaje de los ceros consecutivos dentro de un poroso para obtener las longitudes de hueco
     int a = 0;
     int contaje = 0;
@@ -133,6 +146,9 @@ int main(int argc, char ** argv) {
     for (n = 0; n < contaje; n++) {
       if (flag == 1 && Array[n] != 0)
         flag = 0;
+      if (flag != 1) {
+        //printf("%d,", Array[n]);
+      }
     }
     //Para evitar que todas las cadenas sean iguales, se genera una espera de 1 segundo de forma que cambie la semilla
     sleep(1);
